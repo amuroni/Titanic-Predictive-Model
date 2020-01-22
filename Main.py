@@ -2,8 +2,10 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib import style
 import seaborn as sns
+import re
+import numpy as np
 
-test_dataframe = pd.read_csv(r"C:\Users\muron\Desktop\Coding\VIsual Studio Code\Titanic Predictive Model\train.csv") # use r for raw string data
+test_df = pd.read_csv(r"C:\Users\muron\Desktop\Coding\VIsual Studio Code\Titanic Predictive Model\train.csv") # use r for raw string data
 train_df = pd.read_csv(r"C:\Users\muron\Desktop\Coding\VIsual Studio Code\Titanic Predictive Model\train.csv")  # use r for raw string data
 train_df.info()  # 891 n. of passengers
 train_df.describe()  # shows that 38% fo the set survived!
@@ -39,5 +41,66 @@ ax.set_title('Female')
 ax = sns.distplot(men[men['Survived']==1].Age.dropna(), bins=18, label = survived, ax = axes[1], kde = False)
 ax = sns.distplot(men[men['Survived']==0].Age.dropna(), bins=40, label = not_survived, ax = axes[1], kde = False)
 ax.legend()
-_ = ax.set_title('Male')
+ax.set_title('Male')
 plt.show()
+
+#  2. analyze correlation between Embarked and Pass class, survives and sex
+#  by using a seaborn pointplot chart
+FacetGrid = sns.FacetGrid(train_df, row="Embarked", height=5, aspect=2)
+FacetGrid.map(sns.pointplot, "Pclass", "Survived", "Sex", palette=None, order=None, hue_order=None)
+FacetGrid.add_legend()
+plt.show()
+
+# Embarked is correlated with survival dependind on gender
+# Passenger class is also correlated with survival
+
+# 3. Analyzing by Passenger class
+sns.barplot(x="Pclass", y="Survived", data=train_df)
+plt.show()
+
+# higher survival chance for passengers in class 1!
+# another plot to analyze this by correlating with passenger Age
+
+grid = sns.FacetGrid(train_df, col="Survived", row="Pclass", height=2.2, aspect=1.6)
+grid.map(plt.hist, "Age", alpha =.5, bins=20)
+grid.add_legend()
+plt.show()
+
+# by correlating with age too, seems like Pclass 3 has high chance of not surviving
+
+# 4. Data Processing
+
+train_df = train_df.drop(["PassengerId"], axis=1) # dropping pass ID, no use
+
+# 4.1 dealing with missing data and Cabin, Embarked, Age data
+# assigning deck number to each passenger, where decks go A-G
+
+deck = {"A": 1, "B": 2, "C": 3, "D":4, "E": 5, "F": 6, "G":7, "U": 8, }
+# where U stands for missing data
+data = [train_df, test_df]
+
+for dataset in data:
+    dataset["Cabin"] = dataset["Cabin"].fillna("U0")
+    dataset["Deck"] = dataset["Cabin"].map(lambda x: re.compile("([a-zA-Z]+)").search(x).group())
+    dataset['Deck'] = dataset['Deck'].map(deck)
+    dataset['Deck'] = dataset['Deck'].fillna(0)
+    dataset['Deck'] = dataset['Deck'].astype(int)
+
+# since we created a deck attribute, we can drop cabin
+train_df = train_df.drop(["Cabin"], axis=1)
+test_df = test_df.drop(["Cabin"], axis=1)
+# train_df.head(10)
+# test_df.head(10)
+
+# then: randomize NaN age values based on mean age value
+
+for dataset in data:
+    mean = train_df["Age"].mean()
+    std = test_df["Age"].std()
+    is_null = dataset["Age"].isnull().sum()
+    rand_age = np.random.randint(mean - std, mean + std, size = is_null)
+    age_slice = dataset["Age"].copy()
+    age_slice[np.isnan(age_slice)] = rand_age
+    dataset["Age"] = age_slice
+    # dataset["Age"] = train_df["Age"].astype(int) 
+    # cannot convert na/inf to integer error, there is still some Na/inf value??
