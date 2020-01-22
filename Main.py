@@ -5,8 +5,8 @@ import seaborn as sns
 import re
 import numpy as np
 
-test_df = pd.read_csv(r"C:\Users\muron\Desktop\Coding\VIsual Studio Code\Titanic Predictive Model\train.csv") # use r for raw string data
-train_df = pd.read_csv(r"C:\Users\muron\Desktop\Coding\VIsual Studio Code\Titanic Predictive Model\train.csv")  # use r for raw string data
+test_df = pd.read_csv(r"C:\Users\muron\PycharmProjects\Titanic-Predictive-Model\test.csv")  # use r for raw string data
+train_df = pd.read_csv(r"C:\Users\muron\PycharmProjects\Titanic-Predictive-Model\train.csv")
 train_df.info()  # 891 n. of passengers
 train_df.describe()  # shows that 38% fo the set survived!
 
@@ -18,7 +18,7 @@ total = train_df.isnull().sum().sort_values(ascending=False)
 percent_1 = train_df.isnull().sum()/train_df.isnull().count()*100
 percent_2 = (round(percent_1, 1)).sort_values(ascending=False)
 missing_data = pd.concat([total, percent_2], axis=1, keys=['Total', '%'])
-missing_data.head
+missing_data.head()
 
 # age has 177 missing values
 # Cabin has over 600 missing values..
