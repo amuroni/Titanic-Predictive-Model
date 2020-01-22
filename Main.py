@@ -70,18 +70,19 @@ plt.show()
 
 # 4. Data Processing
 
-train_df = train_df.drop(["PassengerId"], axis=1) # dropping pass ID, no use
+train_df = train_df.drop(["PassengerId"], axis=1)  # dropping pass ID, no use
 
 # 4.1 dealing with missing data and Cabin, Embarked, Age data
 # assigning deck number to each passenger, where decks go A-G
 
-deck = {"A": 1, "B": 2, "C": 3, "D":4, "E": 5, "F": 6, "G":7, "U": 8, }
+deck = {"A": 1, "B": 2, "C": 3, "D": 4, "E": 5, "F": 6, "G": 7, "U": 8, }
+
 # where U stands for missing data
 data = [train_df, test_df]
 
 for dataset in data:
     dataset["Cabin"] = dataset["Cabin"].fillna("U0")
-    dataset["Deck"] = dataset["Cabin"].map(lambda x: re.compile("([a-zA-Z]+)").search(x).group())
+    dataset["Deck"] = dataset["Cabin"].map(lambda x: re.compile('([a-zA-Z]+)').search(x).group())
     dataset['Deck'] = dataset['Deck'].map(deck)
     dataset['Deck'] = dataset['Deck'].fillna(0)
     dataset['Deck'] = dataset['Deck'].astype(int)
@@ -94,13 +95,15 @@ test_df = test_df.drop(["Cabin"], axis=1)
 
 # then: randomize NaN age values based on mean age value
 
+data = [train_df, test_df]
+
 for dataset in data:
     mean = train_df["Age"].mean()
     std = test_df["Age"].std()
     is_null = dataset["Age"].isnull().sum()
-    rand_age = np.random.randint(mean - std, mean + std, size = is_null)
+    rand_age = np.random.randint(mean - std, mean + std, size=is_null)
     age_slice = dataset["Age"].copy()
     age_slice[np.isnan(age_slice)] = rand_age
     dataset["Age"] = age_slice
-    # dataset["Age"] = train_df["Age"].astype(int) 
-    # cannot convert na/inf to integer error, there is still some Na/inf value??
+    dataset["Age"] = train_df["Age"].astype(int)
+
