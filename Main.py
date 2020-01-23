@@ -107,3 +107,19 @@ for dataset in data:
     dataset["Age"] = age_slice
     dataset["Age"] = train_df["Age"].astype(int)
 
+# if we check now the total of NaN values is 0
+
+if print(train_df["Age"].isnull().sum()) == 0:
+    print("No NaN values")
+else:
+    print(str(train_df["Age"].isnull().sum()) + " values")
+
+# 4.2 fill embarked missing values with the most common one, only 2 to fill
+common_value = train_df["Embarked"].describe()["top"]
+
+data = [train_df, test_df]
+for dataset in data:
+    dataset["Embarked"] = dataset["Embarked"].fillna(common_value)
+
+train_df.info()  # now has 891 non-null attributes
+
