@@ -15,7 +15,7 @@ train_df.head(10)  # analyze the first n rows of the df
 # analyze missing data that could impact the ML
 
 total = train_df.isnull().sum().sort_values(ascending=False)
-percent_1 = train_df.isnull().sum()/train_df.isnull().count()*100
+percent_1 = train_df.isnull().sum() / train_df.isnull().count() * 100
 percent_2 = (round(percent_1, 1)).sort_values(ascending=False)
 missing_data = pd.concat([total, percent_2], axis=1, keys=['Total', '%'])
 missing_data.head()
@@ -29,17 +29,17 @@ missing_data.head()
 survived = "survived"
 not_survived = "not survived"
 
-fig, axes = plt.subplots(nrows=1, ncols=2,figsize=(10, 4))
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 4))
 
-women = train_df[train_df["Sex"]=="female"]
+women = train_df[train_df["Sex"] == "female"]
 men = train_df[train_df["Sex"] == "male"]
 
-ax = sns.distplot(women[women['Survived']==1].Age.dropna(), bins=18, label = survived, ax = axes[0], kde =False)
-ax = sns.distplot(women[women['Survived']==0].Age.dropna(), bins=40, label = not_survived, ax = axes[0], kde =False)
+ax = sns.distplot(women[women['Survived'] == 1].Age.dropna(), bins=18, label=survived, ax=axes[0], kde=False)
+ax = sns.distplot(women[women['Survived'] == 0].Age.dropna(), bins=40, label=not_survived, ax=axes[0], kde=False)
 ax.legend()
 ax.set_title('Female')
-ax = sns.distplot(men[men['Survived']==1].Age.dropna(), bins=18, label = survived, ax = axes[1], kde = False)
-ax = sns.distplot(men[men['Survived']==0].Age.dropna(), bins=40, label = not_survived, ax = axes[1], kde = False)
+ax = sns.distplot(men[men['Survived'] == 1].Age.dropna(), bins=18, label=survived, ax=axes[1], kde=False)
+ax = sns.distplot(men[men['Survived'] == 0].Age.dropna(), bins=40, label=not_survived, ax=axes[1], kde=False)
 ax.legend()
 ax.set_title('Male')
 plt.show()
@@ -62,7 +62,7 @@ plt.show()
 # another plot to analyze this by correlating with passenger Age
 
 grid = sns.FacetGrid(train_df, col="Survived", row="Pclass", height=2.2, aspect=1.6)
-grid.map(plt.hist, "Age", alpha =.5, bins=20)
+grid.map(plt.hist, "Age", alpha=.5, bins=20)
 grid.add_legend()
 plt.show()
 
@@ -123,3 +123,29 @@ for dataset in data:
 
 train_df.info()  # now has 891 non-null attributes
 
+# 4.3 convert Fare in int format
+
+data = [train_df, test_df]
+
+for dataset in data:
+    dataset["Fare"] = dataset["Fare"].fillna(0)  # fill NaN with 0
+    dataset["Fare"] = dataset["Fare"].astype(int)
+
+# 4.4 extract Titles from Name and convert into numbers
+
+data = [train_df, test_df]
+titles = {"Mr": 1, "Miss": 2, "Mrs": 3, "Master": 4, "Rare": 5}
+
+for dataset in data:
+    dataset["Title"] = dataset.Name.str.extract('([A-Za-z]+)\.', expand=False)
+    dataset["Title"] = dataset["Title"].replace(['Lady', 'Countess', 'Capt', 'Col', 'Don', 'Dr',
+                                                 'Major', 'Rev', 'Sir', 'Jonkheer', 'Dona'], 'Rare')
+    dataset['Title'] = dataset['Title'].replace('Mlle', 'Miss')
+    dataset['Title'] = dataset['Title'].replace('Ms', 'Miss')
+    dataset['Title'] = dataset['Title'].replace('Mme', 'Mrs')
+    dataset['Title'] = dataset['Title'].map(titles)
+    dataset['Title'] = dataset['Title'].fillna(0)
+
+# dropping Name since it's replaced with Title now
+train_df = train_df.drop(['Name'], axis=1)
+test_df = test_df.drop(['Name'], axis=1)
