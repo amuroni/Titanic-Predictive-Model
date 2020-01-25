@@ -149,3 +149,69 @@ for dataset in data:
 # dropping Name since it's replaced with Title now
 train_df = train_df.drop(['Name'], axis=1)
 test_df = test_df.drop(['Name'], axis=1)
+
+# 4.5 convert Sex into numeric data
+
+genders = {"male": 0, "female": 1}
+data = [train_df, test_df]
+
+for dataset in data:
+    dataset["Sex"] = dataset["Sex"].map(genders)
+
+# 4.6 drop Ticket data since it has too many unique values
+train_df = train_df.drop(["Ticket"], axis=1)
+test_df = test_df.drop(["Ticket"], axis=1)
+
+# 4.7 convert Embarked in numeric
+
+ports = {"S": 0, "C": 1, "Q": 2}
+data = [train_df, test_df]
+
+for dataset in data:
+    dataset['Embarked'] = dataset['Embarked'].map(ports)
+
+# 4.7 create age groups paying attention to group distribution
+
+data = [train_df, test_df]
+
+for dataset in data:
+    dataset['Age'] = dataset['Age'].astype(int)
+    dataset.loc[dataset['Age'] <= 11, 'Age'] = 0
+    dataset.loc[(dataset['Age'] > 11) & (dataset['Age'] <= 18), 'Age'] = 1
+    dataset.loc[(dataset['Age'] > 18) & (dataset['Age'] <= 22), 'Age'] = 2
+    dataset.loc[(dataset['Age'] > 22) & (dataset['Age'] <= 27), 'Age'] = 3
+    dataset.loc[(dataset['Age'] > 27) & (dataset['Age'] <= 33), 'Age'] = 4
+    dataset.loc[(dataset['Age'] > 33) & (dataset['Age'] <= 40), 'Age'] = 5
+    dataset.loc[(dataset['Age'] > 40) & (dataset['Age'] <= 66), 'Age'] = 6
+    dataset.loc[ dataset['Age'] > 66, 'Age'] = 6
+
+# 4.8 create Fare groups same as we did with Age
+
+data = [train_df, test_df]
+
+for dataset in data:
+    dataset.loc[ dataset['Fare'] <= 7.91, 'Fare'] = 0
+    dataset.loc[(dataset['Fare'] > 7.91) & (dataset['Fare'] <= 14.454), 'Fare'] = 1
+    dataset.loc[(dataset['Fare'] > 14.454) & (dataset['Fare'] <= 31), 'Fare']   = 2
+    dataset.loc[(dataset['Fare'] > 31) & (dataset['Fare'] <= 99), 'Fare']   = 3
+    dataset.loc[(dataset['Fare'] > 99) & (dataset['Fare'] <= 250), 'Fare']   = 4
+    dataset.loc[ dataset['Fare'] > 250, 'Fare'] = 5
+    dataset['Fare'] = dataset['Fare'].astype(int)
+
+# 5 adding new features
+
+# age * class
+data = [train_df, test_df]
+for dataset in data:
+    dataset['Age_Class']= dataset['Age']* dataset['Pclass']
+
+# fare per person
+data = [train_df, test_df]
+for dataset in data:
+    dataset['relatives'] = dataset['SibSp'] + dataset['Parch']
+    dataset.loc[dataset['relatives'] > 0, 'not_alone'] = 0
+    dataset.loc[dataset['relatives'] == 0, 'not_alone'] = 1
+    dataset['not_alone'] = dataset['not_alone'].astype(int)
+    dataset['Fare_Per_Person'] = dataset['Fare']/(dataset['relatives']+1)
+    dataset['Fare_Per_Person'] = dataset['Fare_Per_Person'].astype(int)
+
