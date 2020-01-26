@@ -214,4 +214,3 @@ for dataset in data:
     dataset['not_alone'] = dataset['not_alone'].astype(int)
     dataset['Fare_Per_Person'] = dataset['Fare']/(dataset['relatives']+1)
     dataset['Fare_Per_Person'] = dataset['Fare_Per_Person'].astype(int)
-
