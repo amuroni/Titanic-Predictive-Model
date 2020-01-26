@@ -1,15 +1,15 @@
-from Main import test_df
-from Main import train_df
 import pandas as pd
 from sklearn import linear_model
-from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import Perceptron
-from sklearn.linear_model import SGDClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC, LinearSVC
 from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import LinearSVC
+from sklearn.tree import DecisionTreeClassifier
+
+from Main import test_df
+from Main import train_df
 
 # set X and Y train and X test datasets
 X_train = train_df.drop("Survived", axis=1)
