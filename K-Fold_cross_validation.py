@@ -32,11 +32,11 @@ plot = importance_sorted.plot.bar()
 plt.show()
 
 # drop Parch and not_alone since they have no significance
-train_df  = train_df.drop("not_alone", axis=1)
-test_df  = test_df.drop("not_alone", axis=1)
+train_df = train_df.drop("not_alone", axis=1)
+test_df = test_df.drop("not_alone", axis=1)
 
-train_df  = train_df.drop("Parch", axis=1)
-test_df  = test_df.drop("Parch", axis=1)
+train_df = train_df.drop("Parch", axis=1)
+test_df = test_df.drop("Parch", axis=1)
 
 # rerun the random forest model to check accuracy
 rand_forest2 = RandomForestClassifier(n_estimators=100, oob_score=True)
@@ -44,5 +44,5 @@ rand_forest2.fit(X_train, Y_train)
 Y_pred= rand_forest2.predict(X_test)
 rand_forest2_acc = round(rand_forest2.score(X_train, Y_train) * 100, 2)
 print("Random Forest 2 accuracy: " + str(round(rand_forest2_acc, 2)), "%")
-print("OOB Score of Random Forest 2: " + str(round(rand_forest2.oob_score_, 4)*100), "%")
+print("OOB Score of Random Forest 2: " + str(round(rand_forest2.oob_score, 4)*100), "%")
 # almost 93% accuracy and 82% OOB score, good
